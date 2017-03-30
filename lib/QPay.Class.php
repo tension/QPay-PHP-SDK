@@ -94,7 +94,7 @@ class Common_util_pub {
 		$String = $this->formatBizQueryParaMap($Parameters, false);
 		//echo '【string1】'.$String.'</br>';
 		//签名步骤二：在string后加入KEY
-		$String = $String."&key=".WxPayConf_pub::KEY;
+		$String = $String."&key=".QPayConf_pub::KEY;
 		//echo "【string2】".$String."</br>";
 		//签名步骤三：MD5加密
 		$String = md5($String);
@@ -194,10 +194,10 @@ class Common_util_pub {
 		//使用证书：cert 与 key 分别属于两个.pem文件
 		//默认格式为PEM，可以注释
 		curl_setopt($ch,CURLOPT_SSLCERTTYPE,'PEM');
-		curl_setopt($ch,CURLOPT_SSLCERT, WxPayConf_pub::SSLCERT_PATH);
+		curl_setopt($ch,CURLOPT_SSLCERT, QPayConf_pub::SSLCERT_PATH);
 		//默认格式为PEM，可以注释
 		curl_setopt($ch,CURLOPT_SSLKEYTYPE,'PEM');
-		curl_setopt($ch,CURLOPT_SSLKEY, WxPayConf_pub::SSLKEY_PATH);
+		curl_setopt($ch,CURLOPT_SSLKEY, QPayConf_pub::SSLKEY_PATH);
 		//post提交方式
 		curl_setopt($ch,CURLOPT_POST, true);
 		curl_setopt($ch,CURLOPT_POSTFIELDS,$xml);
@@ -248,7 +248,7 @@ class QPay_client_pub extends Common_util_pub {
 	 * 	作用：设置标配的请求参数，生成签名，生成接口参数xml
 	 */
 	function createXml() {
-	   	$this->parameters["mch_id"] = WxPayConf_pub::MCHID;//商户号
+	   	$this->parameters["mch_id"] = QPayConf_pub::MCHID;//商户号
 	    $this->parameters["nonce_str"] = $this->createNoncestr();//随机字符串
 	    $this->parameters["sign"] = $this->getSign($this->parameters);//签名
 	    return  $this->arrayToXml($this->parameters);
@@ -259,7 +259,6 @@ class QPay_client_pub extends Common_util_pub {
 	 */
 	function postXml() {
 	    $xml = $this->createXml();
-	    //echo "<textarea style='width:600px;height:400px;'>{$xml}</textarea>";
 		$this->response = $this->postXmlCurl($xml,$this->url,$this->curl_timeout);
 		return $this->response;
 	}
@@ -290,9 +289,9 @@ class QPay_client_pub extends Common_util_pub {
 class UnifiedOrder_pub extends QPay_client_pub {	
 	function __construct() {
 		//设置接口链接
-		$this->url = "ttps://qpay.qq.com/cgi-bin/pay/qpay_unified_order.cgi";
+		$this->url = "https://qpay.qq.com/cgi-bin/pay/qpay_unified_order.cgi";
 		//设置curl超时时间
-		$this->curl_timeout = WxPayConf_pub::CURL_TIMEOUT;
+		$this->curl_timeout = QPayConf_pub::CURL_TIMEOUT;
 	}
 	
 	/**
@@ -312,11 +311,8 @@ class UnifiedOrder_pub extends QPay_client_pub {
 				throw new SDKRuntimeException("缺少统一支付接口必填参数notify_url！"."<br>");
 			}elseif ($this->parameters["trade_type"] == null) {
 				throw new SDKRuntimeException("缺少统一支付接口必填参数trade_type！"."<br>");
-			}elseif ($this->parameters["trade_type"] == "JSAPI" &&
-				$this->parameters["openid"] == NULL){
-				throw new SDKRuntimeException("统一支付接口中，缺少必填参数openid！trade_type为JSAPI时，openid为必填参数！"."<br>");
 			}
-		   	$this->parameters["mch_id"] = WxPayConf_pub::MCHID;//商户号
+		   	$this->parameters["mch_id"] = QPayConf_pub::MCHID;//商户号
 		   	$this->parameters["fee_type"] = "CNY";//货币类型	  
 		   	$this->parameters["spbill_create_ip"] = $_SERVER['REMOTE_ADDR'];//终端ip	    
 		    $this->parameters["nonce_str"] = $this->createNoncestr();//随机字符串
@@ -334,7 +330,6 @@ class UnifiedOrder_pub extends QPay_client_pub {
 	function getPrepayId() {
 		$this->postXml();
 		$this->result = $this->xmlToArray($this->response);
-		//echo "<textarea style='width:600px;height:400px;'>{$this->response}</textarea>";
 		$prepay_id = $this->result["prepay_id"];
 		return $prepay_id;
 	}
@@ -349,7 +344,7 @@ class OrderQuery_pub extends QPay_client_pub {
 		//设置接口链接
 		$this->url = "https://qpay.qq.com/cgi-bin/pay/qpay_order_query.cgi";
 		//设置curl超时时间
-		$this->curl_timeout = WxPayConf_pub::CURL_TIMEOUT;		
+		$this->curl_timeout = QPayConf_pub::CURL_TIMEOUT;		
 	}
 
 	/**
@@ -363,7 +358,7 @@ class OrderQuery_pub extends QPay_client_pub {
 			{
 				throw new SDKRuntimeException("订单查询接口中，out_trade_no、transaction_id至少填一个！"."<br>");
 			}
-		   	$this->parameters["mch_id"] = WxPayConf_pub::MCHID;//商户号
+		   	$this->parameters["mch_id"] = QPayConf_pub::MCHID;//商户号
 		    $this->parameters["nonce_str"] = $this->createNoncestr();//随机字符串
 		    $this->parameters["sign"] = $this->getSign($this->parameters);//签名
 		    return  $this->arrayToXml($this->parameters);
@@ -384,7 +379,7 @@ class Refund_pub extends QPay_client_pub {
 		//设置接口链接
 		$this->url = "https://api.qpay.qq.com/cgi-bin/pay/qpay_refund.cgi";
 		//设置curl超时时间
-		$this->curl_timeout = WxPayConf_pub::CURL_TIMEOUT;		
+		$this->curl_timeout = QPayConf_pub::CURL_TIMEOUT;		
 	}
 	
 	/**
@@ -404,7 +399,7 @@ class Refund_pub extends QPay_client_pub {
 			} elseif($this->parameters["op_user_id"] == null){
 				throw new SDKRuntimeException("退款申请接口中，缺少必填参数op_user_id！"."<br>");
 			}
-		   	$this->parameters["mch_id"] = WxPayConf_pub::MCHID;//商户号
+		   	$this->parameters["mch_id"] = QPayConf_pub::MCHID;//商户号
 		    $this->parameters["nonce_str"] = $this->createNoncestr();//随机字符串
 		    $this->parameters["sign"] = $this->getSign($this->parameters);//签名
 		    return  $this->arrayToXml($this->parameters);
@@ -434,7 +429,7 @@ class RefundQuery_pub extends QPay_client_pub {
 		//设置接口链接
 		$this->url = "https://qpay.qq.com/cgi-bin/pay/qpay_refund_query.cgi";
 		//设置curl超时时间
-		$this->curl_timeout = WxPayConf_pub::CURL_TIMEOUT;		
+		$this->curl_timeout = QPayConf_pub::CURL_TIMEOUT;		
 	}
 	
 	/**
@@ -449,7 +444,7 @@ class RefundQuery_pub extends QPay_client_pub {
 			{
 				throw new SDKRuntimeException("退款查询接口中，out_refund_no、out_trade_no、transaction_id、refund_id四个参数必填一个！"."<br>");
 			}
-		   	$this->parameters["mch_id"] = WxPayConf_pub::MCHID;//商户号
+		   	$this->parameters["mch_id"] = QPayConf_pub::MCHID;//商户号
 		    $this->parameters["nonce_str"] = $this->createNoncestr();//随机字符串
 		    $this->parameters["sign"] = $this->getSign($this->parameters);//签名
 		    return  $this->arrayToXml($this->parameters);
@@ -479,7 +474,7 @@ class DownloadBill_pub extends QPay_client_pub {
 		//设置接口链接
 		$this->url = "https://qpay.qq.com/cgi-bin/sp_download/qpay_mch_statement_down.cgi";
 		//设置curl超时时间
-		$this->curl_timeout = WxPayConf_pub::CURL_TIMEOUT;		
+		$this->curl_timeout = QPayConf_pub::CURL_TIMEOUT;		
 	}
 
 	/**
@@ -491,7 +486,7 @@ class DownloadBill_pub extends QPay_client_pub {
 			{
 				throw new SDKRuntimeException("对账单接口中，缺少必填参数bill_date！"."<br>");
 			}
-		   	$this->parameters["mch_id"] = WxPayConf_pub::MCHID;//商户号
+		   	$this->parameters["mch_id"] = QPayConf_pub::MCHID;//商户号
 		    $this->parameters["nonce_str"] = $this->createNoncestr();//随机字符串
 		    $this->parameters["sign"] = $this->getSign($this->parameters);//签名
 		    return  $this->arrayToXml($this->parameters);
