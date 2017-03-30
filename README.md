@@ -22,3 +22,6 @@
  - ToArray(),XML 转 ARRAY 
  - postXmlCurl(),以POST 方式提交 XML 到对应的接口 URL
  - postXmlSSLCurl(),使用证书，以 POST 方式提交 XML 到对应的接口 URL
+ 
+ 
+### 感谢 https://github.com/djlinks/wxpay 提供 微信支付接口 SDK
